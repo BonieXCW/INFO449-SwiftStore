@@ -66,4 +66,18 @@ TOTAL: $7.97
 """
         XCTAssertEqual(expectedReceipt, receipt.output())
     }
+    
+    func testAddSingleItemDisplay() {
+        register.scan(Item(name: "New York Steak USDA Choice", priceEach: 4999))
+        XCTAssertEqual(4999, register.subtotal())
+        
+        let receipt = register.total()
+        let expectedReceipt = """
+Receipt:
+New York Steak USDA Choice: $49.99
+------------------
+TOTAL: $49.99
+"""
+        XCTAssertEqual(expectedReceipt, receipt.output())
+    }
 }
