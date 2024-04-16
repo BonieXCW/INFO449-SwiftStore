@@ -31,7 +31,7 @@ class Item: SKU {
 class Receipt {
     
     var current_items: [SKU] = []
-    
+
     func add(_ item: SKU) {
         current_items.append(item)
     }
@@ -60,20 +60,61 @@ class Receipt {
 
 class Register {
     
-    var total_receipt = Receipt()
+    var total_receipt: Receipt
+    var pricingSchema: PricingSchema?
+    
+    init(pricingSchema: PricingSchema?) {
+        self.total_receipt = Receipt()
+        self.pricingSchema = pricingSchema
+    }
+    
+    init() {
+        self.total_receipt = Receipt()
+    }
     
     func scan(_ Scanned: SKU) {
         total_receipt.add(Scanned)
     }
     
     func subtotal() -> Int {
-        return total_receipt.total()
+        return pricingSchema?.apply(items: total_receipt.items()) ?? total_receipt.total()
     }
     
     func total() -> Receipt {
         let final_receipt = total_receipt
         total_receipt = Receipt()
         return final_receipt
+    }
+    
+    func TwoForOne(register: Register) -> Int {
+        var ItemAndCounts: [String: Int] = [:]
+        for item in total_receipt.items() {
+            ItemAndCounts[item.name]? += 1
+        }
+        
+        
+        return 0
+    }
+}
+
+protocol PricingSchema {
+    func apply(items: [SKU]) -> Int
+}
+
+class TwoForOne: PricingSchema {
+    var itemName: String
+    var itemPrice: Int
+    
+    init (itemName: String, itemPrice: Int) {
+        self.itemName = itemName
+        self.itemPrice = itemPrice
+    }
+    
+    func apply(items: [SKU]) -> Int {
+        let filtered = items.filter({ $0.name == itemName})
+        let amount = filtered.count / 3
+        let total = ((amount * 2) + (filtered.count % 3)) * itemPrice
+        return total
     }
 }
 
